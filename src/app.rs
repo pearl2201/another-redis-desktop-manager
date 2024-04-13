@@ -1,3 +1,6 @@
+use egui::{Visuals, Window};
+
+use crate::components::NewConnectionWindow;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -7,6 +10,8 @@ pub struct TemplateApp {
 
     #[serde(skip)] // This how you opt-out of serialization of a field
     value: f32,
+    new_connection_window: NewConnectionWindow
+
 }
 
 impl Default for TemplateApp {
@@ -15,6 +20,7 @@ impl Default for TemplateApp {
             // Example stuff:
             label: "Hello World!".to_owned(),
             value: 2.7,
+            new_connection_window: NewConnectionWindow::default()
         }
     }
 }
@@ -25,6 +31,7 @@ impl TemplateApp {
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
 
+        cc.egui_ctx.set_visuals(Visuals::dark());
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
         if let Some(storage) = cc.storage {
@@ -46,51 +53,68 @@ impl eframe::App for TemplateApp {
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
+        // egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+        //     // The top panel is often a good place for a menu bar:
 
-            egui::menu::bar(ui, |ui| {
-                // NOTE: no File->Quit on web pages!
-                let is_web = cfg!(target_arch = "wasm32");
-                if !is_web {
-                    ui.menu_button("File", |ui| {
-                        if ui.button("Quit").clicked() {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                        }
-                    });
-                    ui.add_space(16.0);
-                }
+        //     egui::menu::bar(ui, |ui| {
+        //         // NOTE: no File->Quit on web pages!
+        //         let is_web = cfg!(target_arch = "wasm32");
+        //         if !is_web {
+        //             ui.menu_button("File", |ui| {
+        //                 if ui.button("Quit").clicked() {
+        //                     ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+        //                 }
+        //             });
+        //             ui.add_space(16.0);
+        //         }
 
-                egui::widgets::global_dark_light_mode_buttons(ui);
-            });
-        });
+        //         egui::widgets::global_dark_light_mode_buttons(ui);
+        //     });
+        // });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
-            ui.heading("eframe template");
+        // egui::CentralPanel::default().show(ctx, |ui| {
+        //     // The central panel the region left after adding TopPanel's and SidePanel's
+        //     ui.heading("eframe template");
 
+        //     ui.horizontal(|ui| {
+        //         ui.label("Write something: ");
+        //         ui.text_edit_singleline(&mut self.label);
+        //     });
+
+        //     ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
+        //     if ui.button("Increment").clicked() {
+        //         self.value += 1.0;
+        //     }
+
+        //     ui.separator();
+
+        //     ui.add(egui::github_link_file!(
+        //         "https://github.com/emilk/eframe_template/blob/master/",
+        //         "Source code."
+        //     ));
+
+        //     ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+        //         powered_by_egui_and_eframe(ui);
+        //         egui::warn_if_debug_build(ui);
+        //     });
+        // });
+        let egui_icon = egui::include_image!("./../data/settings_FILL0_wght400_GRAD0_opsz24.png");
+
+        egui::SidePanel::left("side-panel").show(ctx, |ui| {
+            ui.add_space(16.0);
             ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(&mut self.label);
-            });
-
-            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                self.value += 1.0;
-            }
-
-            ui.separator();
-
-            ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
-                "Source code."
-            ));
-
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                powered_by_egui_and_eframe(ui);
-                egui::warn_if_debug_build(ui);
-            });
+                if ui.button("New connection").clicked() {
+                    print!("abcdef");
+                    //self.new_connection_window = true;
+                    self.new_connection_window.showWindow();
+                }
+                ui.add_space(16.0);
+                if ui.add(egui::Button::image(egui_icon)).clicked() {}
+                if ui.button("L").clicked() {}
+            })
         });
+        self.new_connection_window.draw(ctx);
+        
     }
 }
 
